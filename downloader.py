@@ -49,68 +49,19 @@ def send_request(word='سلام', dictionaries='dehkhoda'):
         print('HTTP Request failed')
 
 
-send_request(word='کتف', dictionaries='moein,amid')
-send_request(word='کتف', dictionaries='dehkhoda')
-send_request(word='دروازه بان', dictionaries='moein,amid')
-send_request(word='دروازه بان', dictionaries='dehkhoda')
-send_request(word='قطعاً', dictionaries='moein,amid')
-send_request(word='قطعاً', dictionaries='dehkhoda')
-send_request(word='کرک', dictionaries='moein,amid')
-send_request(word='کرک', dictionaries='dehkhoda')
-send_request(word='ابر', dictionaries='moein,amid')
+# send_request(word='کتف', dictionaries='moein,amid')
+# send_request(word='کتف', dictionaries='dehkhoda')
+# # send_request(word='دروازه بان', dictionaries='moein,amid')
+# send_request(word='دروازه بان', dictionaries='dehkhoda')
+# # send_request(word='قطعاً', dictionaries='moein,amid')
+# send_request(word='قطعاً', dictionaries='dehkhoda')
+# # send_request(word='کرک', dictionaries='moein,amid')
+# send_request(word='کرک', dictionaries='dehkhoda')
+# # send_request(word='ابر', dictionaries='moein,amid')
 send_request(word='ابر', dictionaries='dehkhoda')
-
-# -------
-# کتف
-# -------
-# dehkhoda کَ
-# dehkhoda کَتَ
-# dehkhoda کَتَ
-# dehkhoda کَتِ\/کِ\/کَ\/کَتَ
-# dehkhoda کِ
-# dehkhoda کُ
-# moein کِ
-# amid ketf
-# -------
-# دروازه بان
-# -------
-# dehkhoda دَرْزَ\/زِ
-# amid darvāzebān
-# -------
-# قطعاً
-# -------
-# dehkhoda قَعَنْ
-# moein قَ عَ نْ
-# -------
-# کرک
-# -------
-# dehkhoda
-# dehkhoda
-# dehkhoda
-# dehkhoda
-# dehkhoda کَ
-# dehkhoda کَ
-# dehkhoda کَ
-# dehkhoda کَ
-# dehkhoda کَ
-# dehkhoda کَرَ
-# -------
-# ابر
-# -------
-# moein   اَ
-# moein اَ بَ
-# moein  ~.
-# moein  ~.
-# amid &#39;abr
-# amid &#39;abar
-# -------
-# ابر
-# -------
-# dehkhoda اَ
-# dehkhoda اَ
-# dehkhoda اَبَ
-# dehkhoda اَبَرر
-# dehkhoda اِبَ
-# dehkhoda اُبُ
-# dehkhoda اُبُ
-# dehkhoda اَ
+# # send_request(word='الاکلنگ', dictionaries='moein,amid')
+# send_request(word='الاکلنگ', dictionaries='dehkhoda')
+# # send_request(word='فعالیت', dictionaries='moein,amid')
+# send_request(word='فعالیت', dictionaries='dehkhoda')
+# send_request(word='نیت', dictionaries='dehkhoda')
+# send_request(word='تهنیت', dictionaries='dehkhoda')
