@@ -2,7 +2,8 @@ import os
 import pickle
 import requests
 
-MY_TOKEN = "26950.t3scZdG7Xpw4dpeUhQVIifShsP2rCwS5AlizyYHw"
+# MY_TOKEN = "26950.t3scZdG7Xpw4dpeUhQVIifShsP2rCwS5AlizyYHw"
+MY_TOKEN = '61378.IrcnbCjqvwdGdoAmklUJGUbmBpY5jdI1EUoQwIh2'
 
 
 def send_request(word, dictionaries='dehkhoda,moein,amid'):
@@ -44,6 +45,8 @@ def add_to_dictionary(new_words):
         if word in dictionary:
             print('[W]', word, 'is already in the dictionary!')
             continue
+        # making separate requests for dehkhoda and the others due to the limit of max 12 entries in the response
+        # TODO: somethimes Dehkhoda itself has more than 12 entries. Gotta do smth about that!
         meanings = send_request(word, dictionaries='dehkhoda')
         meanings += send_request(word, dictionaries='moein,amid')
         if not meanings:
@@ -57,5 +60,6 @@ def add_to_dictionary(new_words):
     print('new words added.')
 
 
-input_words = ['کتف', 'دروازه بان', 'قطعاً', 'کرک', 'ابر', 'الاکلنگ', 'فعالیت', 'نیت', 'تهنیت', 'اهمیت', 'جبار']
+input_words = ['کتف', 'دروازه بان', 'قطعاً', 'کرک', 'ابر', 'الاکلنگ', 'فعالیت', 'نیت', 'تهنیت', 'اهمیت', 'کش',
+               'جبار','به','سخی','شدت','ضدیت']
 add_to_dictionary(input_words)

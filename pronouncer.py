@@ -2,11 +2,19 @@ import pickle
 
 from wordie import Wordie
 
-def make_wordies():
+
+def make_wordies(words):
     with open('./res/dictionary.pkl', 'rb') as infile:
         dictionary = pickle.load(infile)
+    if words is None:
+        words = dictionary.keys()
 
-    for word, meanings in dictionary.items():
+    for word in words:
+        try:
+            meanings = dictionary[word]
+        except KeyError as ke:
+            print(ke)
+            continue
         wordie = Wordie(word)
         for res in meanings:
             if res['id'].startswith('dehkhoda'):
@@ -28,5 +36,6 @@ def make_wordies():
                 except Exception as e:
                     print(e)
 
-make_wordies()
+
+make_wordies(['سخی','شدت','ضدیت'])
 # TODO: verbs and compounds
