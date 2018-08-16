@@ -79,7 +79,7 @@ class Wordie:
                     # if there are no cons-vow pairs for this character
                     else:
                         prn_word += self.text[i]
-                
+
                 prn_word = prn_word.replace('ْ', '')
                 # add the voweled word to the set of all pronunciations
                 self.text_vowel.add(prn_word)

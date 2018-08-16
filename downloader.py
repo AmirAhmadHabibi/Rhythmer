@@ -1,67 +1,61 @@
+import os
+import pickle
 import requests
-from wordie import Wordie
+
+MY_TOKEN = "26950.t3scZdG7Xpw4dpeUhQVIifShsP2rCwS5AlizyYHw"
 
 
-def send_request(word='سلام', dictionaries='dehkhoda'):
+def send_request(word, dictionaries='dehkhoda,moein,amid'):
     try:
-        # TODO: verbs and compounds
-        print('-------')
-        print(word)
+        print(':::', word, ':::')
         response = requests.get(
             url="http://api.vajehyab.com/v3/search",
             params={
-                "token": "26950.1yq8LLtXqUIfJj070qK6qQtWVe50ioikWIsItVFU",
+                "token": MY_TOKEN,
                 "q": word,
                 "type": "exact",
                 "filter": dictionaries,
             },
         )
-
-        # "filter": "dehkhoda,moein,amid",
-        # print('Response HTTP Status Code: {status_code}'.format(status_code=response.status_code))
-        # print('Response HTTP Response Body: {content}'.format(content=response.content))
         resp = str(response.content, encoding='utf-8')
         resp = resp.replace('true', 'True')
+        resp = resp.replace('false', 'False')
         resp = resp.replace('null', 'None')
         resp = eval(resp)
-        wordie = Wordie(word)
-        for res in resp['data']['results']:
-            if res['id'].startswith('dehkhoda'):
-                pron = res['text'].partition('[')[2].partition(']')[0]
-                pron = ''.join(pron.split())
-                try:
-                    wordie.add_pronunciation(pron, 'dehkhoda')
-                except Exception as e:
-                    print(e)
-            elif res['id'].startswith('moein'):
-                pron = res['text'].partition('(')[2].partition(')')[0]
-                try:
-                    wordie.add_pronunciation(pron, 'moein')
-                except Exception as e:
-                    print(e)
-            elif res['id'].startswith('amid'):
-                try:
-                    wordie.add_pronunciation(res['pron'], 'amid')
-                except Exception as e:
-                    print(e)
-        return wordie
+        if not resp['response']['status']:
+            print(resp)
+            raise Exception('[E] Come back later! Vajehyab doesn\'t feel like doing it.')
+        return resp['data']['results']
     except requests.exceptions.RequestException:
         print('HTTP Request failed')
+    return []
 
 
-send_request(word='کتف', dictionaries='moein,amid')
-send_request(word='کتف', dictionaries='dehkhoda')
-# send_request(word='دروازه بان', dictionaries='moein,amid')
-send_request(word='دروازه بان', dictionaries='dehkhoda')
-# send_request(word='قطعاً', dictionaries='moein,amid')
-send_request(word='قطعاً', dictionaries='dehkhoda')
-# send_request(word='کرک', dictionaries='moein,amid')
-send_request(word='کرک', dictionaries='dehkhoda')
-# send_request(word='ابر', dictionaries='moein,amid')
-send_request(word='ابر', dictionaries='dehkhoda')
-# send_request(word='الاکلنگ', dictionaries='moein,amid')
-send_request(word='الاکلنگ', dictionaries='dehkhoda')
-# send_request(word='فعالیت', dictionaries='moein,amid')
-send_request(word='فعالیت', dictionaries='dehkhoda')
-send_request(word='نیت', dictionaries='dehkhoda')
-send_request(word='تهنیت', dictionaries='dehkhoda')
+def add_to_dictionary(new_words):
+    # open the dictionary
+    if os.path.isfile('./res/dictionary.pkl'):
+        with open('./res/dictionary.pkl', 'rb') as infile:
+            dictionary = pickle.load(infile)
+    else:
+        dictionary = dict()
+
+    # add the new words
+    for word in new_words:
+        if word in dictionary:
+            print('[W]', word, 'is already in the dictionary!')
+            continue
+        meanings = send_request(word, dictionaries='dehkhoda')
+        meanings += send_request(word, dictionaries='moein,amid')
+        if not meanings:
+            print('[W] both responses for', word, 'were empty!')
+            continue
+        dictionary[word] = meanings
+
+    # save the dictionary
+    with open('./res/dictionary.pkl', 'wb') as outfile:
+        pickle.dump(dictionary, outfile)
+    print('new words added.')
+
+
+input_words = ['کتف', 'دروازه بان', 'قطعاً', 'کرک', 'ابر', 'الاکلنگ', 'فعالیت', 'نیت', 'تهنیت', 'اهمیت', 'جبار']
+add_to_dictionary(input_words)
