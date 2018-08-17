@@ -8,7 +8,7 @@ def make_wordies(words=None):
         dictionary = pickle.load(infile)
     if words is None:
         words = dictionary.keys()
-
+    wordies = set()
     for word in words:
         try:
             meanings = dictionary[word]
@@ -36,9 +36,11 @@ def make_wordies(words=None):
                 except Exception as e:
                     print(e)
 
-        print('------')
         wordie.build_hejas()
-        # print('------')
+        wordies.add(wordie)
+
+    with open('./res/wordies.pkl', 'wb') as outfile:
+        pickle.dump(wordies, outfile)
 
 
 make_wordies()

@@ -16,6 +16,7 @@ def send_request(word, dictionaries='dehkhoda,moein,amid'):
                 "q": word,
                 "type": "exact",
                 "filter": dictionaries,
+                "rows": "50",
             },
         )
         resp = str(response.content, encoding='utf-8')
@@ -46,9 +47,9 @@ def add_to_dictionary(new_words):
             print('[W]', word, 'is already in the dictionary!')
             continue
         # making separate requests for dehkhoda and the others due to the limit of max 12 entries in the response
-        # TODO: somethimes Dehkhoda itself has more than 12 entries. Gotta do smth about that!
-        meanings = send_request(word, dictionaries='dehkhoda')
-        meanings += send_request(word, dictionaries='moein,amid')
+        meanings = send_request(word, dictionaries='dehkhoda,moein,amid')
+        # meanings = send_request(word, dictionaries='dehkhoda')
+        # meanings += send_request(word, dictionaries='moein,amid')
         if not meanings:
             print('[W] both responses for', word, 'were empty!')
             continue
@@ -61,5 +62,5 @@ def add_to_dictionary(new_words):
 
 
 input_words = ['کتف', 'دروازه بان', 'قطعاً', 'کرک', 'ابر', 'الاکلنگ', 'فعالیت', 'نیت', 'تهنیت', 'اهمیت', 'کش',
-               'جبار','به','سخی','شدت','ضدیت']
+               'جبار', 'به', 'سخی', 'شدت', 'ضدیت', 'قرآن', 'فناوری', 'سرآمد', 'پیام', 'دولت']
 add_to_dictionary(input_words)

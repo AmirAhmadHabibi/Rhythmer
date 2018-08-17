@@ -1,4 +1,4 @@
-LETTERS = 'آابپتثجچحخدذرزژسشصضطضعغفقکگلمنوهیيئءؤأإةۀ'
+LETTERS = 'ابپتثجچحخدذرزژسشصضطضعغفقکگلمنوهیيئءؤأإةۀ'
 LONG_VOWELS = ['ا', 'ی', 'و']
 SAKEN = 'ْ'
 FATHEH = 'َ'
@@ -18,6 +18,7 @@ class Wordie:
         self.text = text
         self.text = self.text.replace('اً', 'ن')
         self.text = self.text.replace('ي', 'ی')
+        self.text = self.text.replace('آ', 'ئا')
         self.text_vowel = set()
         self.hejas = dict()
 
@@ -30,6 +31,7 @@ class Wordie:
             input_prn = input_prn.replace('\/', '-')
             input_prn = input_prn.replace('ي', 'ی')
             input_prn = input_prn.replace('ً', 'َ')
+            input_prn = input_prn.replace('آ', 'ئا')
             for c in input_prn:
                 if c == ' ':
                     continue
@@ -57,7 +59,7 @@ class Wordie:
                     if c == consonant:  # Thashdeed
                         prn_list[list_index].append((consonant, SAKEN))
                     else:
-                        print('[W] This seems weird', input_prn)
+                        print('[W] This seems weird \tw:' + self.text + '\tp: ' + input_prn + '\tc: ' + c)
                         prn_list[list_index].append((consonant, ''))
                     consonant = c
                 # otherwise
@@ -117,34 +119,23 @@ class Wordie:
             pass
 
     def build_hejas(self):
+        print(self.text)
         for wrd in self.text_vowel:
             try:
                 heja_list = []
                 hj = ''
                 state = 0
                 for i in range(len(wrd)):
+                    hj += wrd[i]
                     if state == 0:
-                        if wrd[i] == 'آ':
-                            hj += wrd[i]
-                            # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
-                                state = 0
-                                heja_list.append(hj)
-                                hj = ''
-                            else:
-                                state = 2
-                        elif wrd[i] in LETTERS:
-                            hj += wrd[i]
+                        if wrd[i] in LETTERS:
                             state = 1
                         else:
                             raise Exception('[E] Bad word!', wrd)
                     elif state == 1:
                         if wrd[i] in VOWELS:
-                            hj += wrd[i]
                             # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                            if i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS:
                                 state = 0
                                 heja_list.append(hj)
                                 hj = ''
@@ -154,10 +145,8 @@ class Wordie:
                             raise Exception('[E] Bad word!', wrd)
                     elif state == 2:
                         if wrd[i] in LETTERS:
-                            hj += wrd[i]
                             # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                            if i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS:
                                 state = 0
                                 heja_list.append(hj)
                                 hj = ''
@@ -167,20 +156,16 @@ class Wordie:
                             raise Exception('[E] Bad word!', wrd)
                     elif state == 3:
                         if wrd[i] in LETTERS:
-                            hj += wrd[i]
                             # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                            if i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS:
                                 state = 0
                                 heja_list.append(hj)
                                 hj = ''
                             else:
                                 state = 3
                         elif wrd[i] == SAKEN:
-                            hj += wrd[i]
                             # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                            if i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS:
                                 state = 0
                                 heja_list.append(hj)
                                 hj = ''
@@ -190,10 +175,8 @@ class Wordie:
                             raise Exception('[E] Bad word!', wrd)
                     elif state == 4:
                         if wrd[i] in LETTERS:
-                            hj += wrd[i]
                             # lookahead
-                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
-                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                            if i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS:
                                 state = 0
                                 heja_list.append(hj)
                                 hj = ''
@@ -203,10 +186,14 @@ class Wordie:
                             raise Exception('[E] Bad word!', wrd)
                 if hj != '':
                     heja_list.append(hj)
+
                 print(wrd, heja_list)
                 self.hejas[wrd] = heja_list
             except Exception as e:
                 print(e)
+        print('------')
+
+    
 
 
 class Heja:
