@@ -3,7 +3,7 @@ import pickle
 from wordie import Wordie
 
 
-def make_wordies(words):
+def make_wordies(words=None):
     with open('./res/dictionary.pkl', 'rb') as infile:
         dictionary = pickle.load(infile)
     if words is None:
@@ -36,6 +36,11 @@ def make_wordies(words):
                 except Exception as e:
                     print(e)
 
+        print('------')
+        wordie.build_hejas()
+        # print('------')
 
-make_wordies(['سخی','شدت','ضدیت'])
+
+make_wordies()
+
 # TODO: verbs and compounds

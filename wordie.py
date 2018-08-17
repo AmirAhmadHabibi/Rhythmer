@@ -1,10 +1,12 @@
 LETTERS = 'آابپتثجچحخدذرزژسشصضطضعغفقکگلمنوهیيئءؤأإةۀ'
-LONG_VOWELS = 'ایو'
+LONG_VOWELS = ['ا', 'ی', 'و']
 SAKEN = 'ْ'
 FATHEH = 'َ'
 KASREH = 'ِ'
 ZAMMEH = 'ُ'
-SHORT_VOWELS = [SAKEN, FATHEH, KASREH, ZAMMEH]
+EROB = [SAKEN, FATHEH, KASREH, ZAMMEH]
+SHORT_VOWELS = [FATHEH, KASREH, ZAMMEH]
+VOWELS = LONG_VOWELS + SHORT_VOWELS
 
 
 # be and beh cases
@@ -17,33 +19,34 @@ class Wordie:
         self.text = self.text.replace('اً', 'ن')
         self.text = self.text.replace('ي', 'ی')
         self.text_vowel = set()
+        self.hejas = dict()
 
-    def add_pronunciation(self, prn, dictionary):
+    def add_pronunciation(self, input_prn, dictionary):
         if dictionary == 'dehkhoda':
             # extract the consonant vowel pairs out of the raw formula
             prn_list = [[]]
-            list_index = 0  # in case of seeng / this index would be added
+            list_index = 0  # in case of seeing / this index would be added
             consonant = None
-            prn = prn.replace('\/', '-')
-            prn = prn.replace('ي', 'ی')
-            prn = prn.replace('ً', 'َ')
-            for c in prn:
+            input_prn = input_prn.replace('\/', '-')
+            input_prn = input_prn.replace('ي', 'ی')
+            input_prn = input_prn.replace('ً', 'َ')
+            for c in input_prn:
                 if c == ' ':
                     continue
                 # the case of a regular consonant
                 elif consonant is None and c in LETTERS:
                     consonant = c
                 # regular vowel
-                elif c in SHORT_VOWELS or c in LONG_VOWELS:
+                elif c in VOWELS or c == SAKEN:
                     vowel = c
                     if consonant is None:
-                        print('[W] What is this vowel doing here? \tw:' + self.text + '\tp: ' + prn + '\tc: ' + c)
+                        print('[W] What is this vowel doing here? \tw:' + self.text + '\tp: ' + input_prn + '\tc: ' + c)
                         continue
                     prn_list[list_index].append((consonant, vowel))
                     consonant = None
                 # a new group
                 elif c == '-':
-                    # TODO: partial and complete differences seem to be not distinguishable!! e.g. کرک - سخی
+                    # TODO: partial and complete differences seem to be not distinguishable!! e.g. نخستین - سخی
                     if consonant is not None:
                         prn_list[list_index].append((consonant, ''))
                     consonant = None
@@ -51,15 +54,15 @@ class Wordie:
                     prn_list.append([])
                 # the case of Tashdeed and some other case
                 elif c in LETTERS:
-                    if c == consonant: # Thashdeed
+                    if c == consonant:  # Thashdeed
                         prn_list[list_index].append((consonant, SAKEN))
                     else:
-                        print('[W] This seems weird', prn)
+                        print('[W] This seems weird', input_prn)
                         prn_list[list_index].append((consonant, ''))
                     consonant = c
                 # otherwise
                 else:
-                    raise Exception('What is this char? \tw:' + self.text + '--' + prn + '--' + c)
+                    raise Exception('What is this char? \tw:' + self.text + '--' + input_prn + '--' + c)
             if consonant is not None:
                 prn_list[list_index].append((consonant, ''))
 
@@ -75,7 +78,7 @@ class Wordie:
 
                     # if there is a cons-vow pair for this character
                     if curr_pair is not None and self.text[text_index] == curr_pair[0]:
-                        # the case of semi tashdeeds on ی
+                        # the case of semi Tashdeeds on ی
                         if next_pair is not None and curr_pair[1] == 'ی' and next_pair[0] == 'ی':
                             prn_word += curr_pair[0] + curr_pair[1]
                         # the case of Tashdeed I hope
@@ -102,7 +105,9 @@ class Wordie:
                 # add the voweled word to the set of all pronunciations
                 self.text_vowel.add(prn_word)
 
-                print(dictionary, ':\t in[', prn, ']\tout [', prn_word, ']')
+                # TODO: maybe check for partials here
+
+                # print(dictionary, ':\t in[', input_prn, ']\tout [', prn_word, ']')
 
         elif dictionary == 'moein':
             # TODO
@@ -112,7 +117,96 @@ class Wordie:
             pass
 
     def build_hejas(self):
-        pass
+        for wrd in self.text_vowel:
+            try:
+                heja_list = []
+                hj = ''
+                state = 0
+                for i in range(len(wrd)):
+                    if state == 0:
+                        if wrd[i] == 'آ':
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 2
+                        elif wrd[i] in LETTERS:
+                            hj += wrd[i]
+                            state = 1
+                        else:
+                            raise Exception('[E] Bad word!', wrd)
+                    elif state == 1:
+                        if wrd[i] in VOWELS:
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 2
+                        else:
+                            raise Exception('[E] Bad word!', wrd)
+                    elif state == 2:
+                        if wrd[i] in LETTERS:
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 3
+                        else:
+                            raise Exception('[E] Bad word!', wrd)
+                    elif state == 3:
+                        if wrd[i] in LETTERS:
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 3
+                        elif wrd[i] == SAKEN:
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 4
+                        else:
+                            raise Exception('[E] Bad word!', wrd)
+                    elif state == 4:
+                        if wrd[i] in LETTERS:
+                            hj += wrd[i]
+                            # lookahead
+                            if (i + 1 < len(wrd) and wrd[i + 1] == 'آ') or (
+                                    i + 2 < len(wrd) and wrd[i + 1] in LETTERS and wrd[i + 2] in VOWELS):
+                                state = 0
+                                heja_list.append(hj)
+                                hj = ''
+                            else:
+                                state = 3
+                        else:
+                            raise Exception('[E] Bad word!', wrd)
+                if hj != '':
+                    heja_list.append(hj)
+                print(wrd, heja_list)
+                self.hejas[wrd] = heja_list
+            except Exception as e:
+                print(e)
 
 
 class Heja:
